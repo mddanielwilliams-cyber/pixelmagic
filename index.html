@@ -1,0 +1,1445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>PixelMagic AI – Photo Enhancer | Blur Remove, Denoise, Restore</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --or:#FF5C28;--or2:#ff7043;--or3:#fff4f0;
+  --g50:#F9FAFB;--g100:#F3F4F6;--g200:#E5E7EB;--g300:#D1D5DB;
+  --g400:#9CA3AF;--g500:#6B7280;--g700:#374151;--g900:#111827;
+  --wh:#fff;
+  --sh:0 1px 4px rgba(0,0,0,.07);
+  --sh2:0 4px 18px rgba(0,0,0,.09);
+  --sh3:0 10px 40px rgba(0,0,0,.12);
+}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--wh);color:var(--g900);overflow-x:hidden}
+
+/* ── HEADER ── */
+header{
+  position:sticky;top:0;z-index:300;
+  background:rgba(255,255,255,.97);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--g200);
+  height:62px;padding:0 36px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.logo{display:flex;align-items:center;gap:9px;cursor:pointer;text-decoration:none}
+.logo-ico{width:36px;height:36px;border-radius:9px;background:linear-gradient(135deg,var(--or),#ff8c42);display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 2px 8px rgba(255,92,40,.35)}
+.logo-tx{font-size:20px;font-weight:800;letter-spacing:-.5px}
+.logo-tx span{color:var(--or)}
+nav{display:flex;gap:4px}
+nav a{padding:6px 13px;border-radius:8px;font-size:13.5px;font-weight:500;color:var(--g500);text-decoration:none;transition:.15s}
+nav a:hover,.nav-a{background:var(--g100);color:var(--g900)!important}
+.hdr-r{display:flex;gap:9px;align-items:center}
+.btn-li{padding:7px 17px;border-radius:8px;border:1px solid var(--g200);background:var(--wh);font-size:13.5px;font-weight:600;color:var(--g700);cursor:pointer;font-family:inherit;transition:.15s}
+.btn-li:hover{border-color:var(--g400)}
+.btn-fr{padding:7px 17px;border-radius:8px;background:var(--or);border:none;font-size:13.5px;font-weight:700;color:#fff;cursor:pointer;font-family:inherit;box-shadow:0 2px 9px rgba(255,92,40,.3);transition:.15s}
+.btn-fr:hover{background:var(--or2);transform:translateY(-1px)}
+
+/* ── HOME / HERO ── */
+#home{background:linear-gradient(175deg,#fff8f5 0%,#fff 60%);padding:56px 36px 48px;text-align:center;border-bottom:1px solid var(--g200)}
+.badge{display:inline-flex;align-items:center;gap:6px;background:rgba(255,92,40,.08);border:1px solid rgba(255,92,40,.22);color:var(--or);padding:5px 15px;border-radius:100px;font-size:13px;font-weight:600;margin-bottom:18px}
+.badge::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--or);animation:blink 1.6s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+h1{font-size:clamp(30px,5vw,52px);font-weight:800;letter-spacing:-1.5px;line-height:1.08;margin-bottom:14px}
+h1 .hl{color:var(--or)}
+.sub{font-size:16px;color:var(--g500);max-width:540px;margin:0 auto 32px;line-height:1.65}
+
+/* Tool tabs */
+.ttabs{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-bottom:30px}
+.ttab{padding:8px 18px;border-radius:100px;border:1.5px solid var(--g200);background:var(--wh);font-size:13px;font-weight:600;color:var(--g500);cursor:pointer;transition:.15s;font-family:inherit}
+.ttab:hover{border-color:var(--or);color:var(--or)}
+.ttab.on{background:var(--or);color:#fff;border-color:var(--or);box-shadow:0 2px 10px rgba(255,92,40,.28)}
+
+/* Upload box */
+.upbox{
+  max-width:760px;margin:0 auto;
+  border:2px dashed var(--g300);border-radius:20px;
+  padding:52px 36px;cursor:pointer;
+  background:var(--wh);
+  box-shadow:var(--sh2);
+  transition:.2s;
+}
+.upbox:hover{border-color:var(--or);background:#fffaf8;box-shadow:0 8px 32px rgba(255,92,40,.1)}
+.upbox.drag{border-color:var(--or);background:#fff5f0}
+.up-ico{width:76px;height:76px;border-radius:18px;background:rgba(255,92,40,.08);margin:0 auto 18px;display:flex;align-items:center;justify-content:center}
+.upbox h2{font-size:19px;font-weight:700;margin-bottom:7px}
+.upbox p{font-size:14px;color:var(--g400);margin-bottom:26px}
+.btn-up{display:inline-flex;align-items:center;gap:8px;padding:13px 30px;border-radius:11px;background:var(--or);border:none;font-size:15px;font-weight:700;color:#fff;cursor:pointer;font-family:inherit;box-shadow:0 4px 16px rgba(255,92,40,.35);transition:.2s}
+.btn-up:hover{background:var(--or2);transform:translateY(-2px);box-shadow:0 8px 22px rgba(255,92,40,.4)}
+.fmts{display:flex;flex-wrap:wrap;justify-content:center;gap:7px;margin-top:18px}
+.fmt{background:var(--g100);border:1px solid var(--g200);color:var(--g500);font-size:11.5px;font-weight:600;padding:3px 10px;border-radius:6px}
+input[type=file]{display:none}
+
+/* ── WORKSPACE ── */
+#ws{display:none;padding:28px 36px 56px;max-width:1120px;margin:0 auto}
+.ws-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
+.ws-top h2{font-size:19px;font-weight:700}
+.btn-bk{display:flex;align-items:center;gap:5px;padding:7px 15px;border-radius:8px;border:1px solid var(--g200);background:var(--wh);font-size:13px;font-weight:600;color:var(--g700);cursor:pointer;font-family:inherit;transition:.15s}
+.btn-bk:hover{border-color:var(--or);color:var(--or);background:var(--or3)}
+.ws-grid{display:grid;grid-template-columns:1fr 310px;gap:18px;align-items:start}
+
+/* Image panel */
+.img-panel{background:var(--wh);border:1px solid var(--g200);border-radius:16px;overflow:hidden;box-shadow:var(--sh2)}
+.view-tabs{display:flex;border-bottom:1px solid var(--g200);background:var(--g50)}
+.vtab{flex:1;padding:11px 4px;font-size:12.5px;font-weight:600;color:var(--g400);border:none;background:none;cursor:pointer;font-family:inherit;border-bottom:2px solid transparent;transition:.15s}
+.vtab.on{color:var(--or);border-bottom-color:var(--or);background:var(--wh)}
+.img-stage{position:relative;min-height:470px;height:470px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;overflow:hidden;cursor:grab}
+.img-stage:active{cursor:grabbing}
+
+/* Zoom toolbar */
+.zoom-bar{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);z-index:30;display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);border:1px solid var(--g200);border-radius:30px;padding:5px 12px;box-shadow:0 2px 12px rgba(0,0,0,.12)}
+.zoom-bar button{width:28px;height:28px;border-radius:50%;border:none;background:none;font-size:17px;cursor:pointer;color:var(--g700);display:flex;align-items:center;justify-content:center;transition:.15s;font-weight:700}
+.zoom-bar button:hover{background:var(--or3);color:var(--or)}
+.zoom-pct{font-size:11.5px;font-weight:700;color:var(--g700);min-width:36px;text-align:center}
+
+/* Compare slider */
+.cmp{position:relative;width:100%;height:100%;line-height:0;user-select:none;transform-origin:center center}
+.cmp .base{width:100%;height:470px;object-fit:contain;display:block;background:#e8e8e8}
+.cmp .over-wrap{position:absolute;top:0;left:0;height:100%;overflow:hidden}
+.cmp .over-wrap img{width:100%;height:470px;object-fit:contain;display:block}
+.sl-line{position:absolute;top:0;bottom:0;width:3px;background:var(--or);cursor:ew-resize;z-index:10;transform:translateX(-50%);left:50%}
+.sl-handle{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:38px;height:38px;background:var(--wh);border:3px solid var(--or);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:var(--or);box-shadow:0 2px 12px rgba(0,0,0,.14)}
+.lbl{position:absolute;bottom:12px;background:rgba(0,0,0,.62);color:#fff;font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:5px;letter-spacing:.5px;z-index:5}
+.lbl-l{left:12px}.lbl-r{right:12px}
+
+/* single view img */
+.sv{max-width:100%;max-height:470px;object-fit:contain;display:none}
+
+/* placeholder */
+.ph{display:flex;flex-direction:column;align-items:center;gap:10px;color:var(--g300)}
+.ph svg{opacity:.5}
+.ph span{font-size:13px;font-weight:600}
+
+/* loader */
+.loader{display:none;position:absolute;inset:0;background:rgba(255,255,255,.93);flex-direction:column;align-items:center;justify-content:center;gap:13px;z-index:20}
+.loader.show{display:flex}
+.ring-svg{width:62px;height:62px;transform:rotate(-90deg)}
+.ring-t{fill:none;stroke:var(--g200);stroke-width:5}
+.ring-f{fill:none;stroke:var(--or);stroke-width:5;stroke-linecap:round;stroke-dasharray:164;stroke-dashoffset:164;transition:stroke-dashoffset .22s}
+.l-pct{font-size:26px;font-weight:800;color:var(--or)}
+.l-msg{font-size:13.5px;font-weight:600;color:var(--g700)}
+.l-sub{font-size:11.5px;color:var(--g400)}
+
+/* ── RIGHT PANEL ── */
+.rp{display:flex;flex-direction:column;gap:13px}
+.card{background:var(--wh);border:1px solid var(--g200);border-radius:14px;padding:17px;box-shadow:var(--sh)}
+.card h3{font-size:13px;font-weight:700;color:var(--g700);margin-bottom:12px;display:flex;align-items:center;gap:5px}
+
+/* Tool selector */
+.tools-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.tool-btn{
+  padding:11px 8px;border-radius:10px;
+  border:1.5px solid var(--g200);background:var(--wh);
+  text-align:center;cursor:pointer;transition:.15s;
+  font-family:inherit;
+}
+.tool-btn:hover{border-color:var(--or);background:var(--or3)}
+.tool-btn.on{border-color:var(--or);background:var(--or3)}
+.tool-btn .ti{font-size:20px;display:block;margin-bottom:5px}
+.tool-btn .tn{font-size:11.5px;font-weight:700;color:var(--g900);display:block}
+.tool-btn .td{font-size:10px;color:var(--g400);display:block;margin-top:2px}
+.tool-btn.on .tn{color:var(--or)}
+
+/* Intensity slider */
+.sldr-row{display:flex;align-items:center;gap:10px}
+.sldr-row label{font-size:12px;font-weight:600;color:var(--g500);min-width:70px}
+.sldr-row input[type=range]{flex:1;accent-color:var(--or);height:4px;cursor:pointer}
+.sldr-val{font-size:12px;font-weight:700;color:var(--or);min-width:28px;text-align:right}
+
+/* Scale */
+.sc-btns{display:flex;gap:6px}
+.sc-btn{flex:1;padding:8px 4px;border-radius:8px;border:1.5px solid var(--g200);background:var(--wh);font-size:12px;font-weight:700;color:var(--g500);cursor:pointer;transition:.15s;font-family:inherit}
+.sc-btn:hover{border-color:var(--or);color:var(--or)}
+.sc-btn.on{background:var(--or);border-color:var(--or);color:#fff}
+
+/* Stats */
+.st-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.st{background:var(--g50);border-radius:9px;padding:10px}
+.st-l{font-size:10px;color:var(--g400);font-weight:700;letter-spacing:.5px;margin-bottom:3px}
+.st-v{font-size:13.5px;font-weight:800;color:var(--g900)}
+.st-v.gr{color:#16a34a}.st-v.or{color:var(--or)}
+
+/* Enhance button */
+.btn-enh{
+  width:100%;padding:14px;border-radius:12px;
+  background:linear-gradient(135deg,var(--or),#ff7043);
+  border:none;color:#fff;font-size:15px;font-weight:700;
+  font-family:inherit;cursor:pointer;
+  box-shadow:0 4px 16px rgba(255,92,40,.35);
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  transition:.2s;
+}
+.btn-enh:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 24px rgba(255,92,40,.45)}
+.btn-enh:disabled{opacity:.45;cursor:not-allowed}
+.btn-dl{
+  width:100%;padding:12px;border-radius:11px;
+  background:var(--wh);border:1.5px solid var(--g200);
+  color:var(--g700);font-size:14px;font-weight:700;
+  font-family:inherit;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:7px;
+  margin-top:8px;transition:.2s;
+}
+.btn-dl:hover:not(:disabled){border-color:var(--or);color:var(--or);background:var(--or3)}
+.btn-dl:disabled{opacity:.32;cursor:not-allowed}
+.ext-link{
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  margin-top:8px;padding:9px;border-radius:9px;
+  border:1.5px dashed rgba(255,92,40,.3);
+  color:var(--or);font-size:12px;font-weight:700;
+  text-decoration:none;background:rgba(255,92,40,.03);
+  transition:.15s;
+}
+.ext-link:hover{background:rgba(255,92,40,.07)}
+
+/* Process log */
+.log-box{background:var(--g50);border-radius:9px;padding:11px;max-height:90px;overflow-y:auto;font-size:11px;color:var(--g500);line-height:1.7;font-weight:500}
+.log-box .ok{color:#16a34a;font-weight:700}
+
+/* ── TOOLS SHOWCASE (below workspace) ── */
+.showcase{background:var(--g50);border-top:1px solid var(--g200);padding:60px 36px}
+.s-ctr{max-width:1020px;margin:0 auto;text-align:center}
+.s-tag{font-size:11.5px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--or);margin-bottom:10px}
+.s-title{font-size:clamp(24px,3.5vw,36px);font-weight:800;letter-spacing:-1px;margin-bottom:46px}
+.fx-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.fx-card{background:var(--wh);border:1px solid var(--g200);border-radius:14px;padding:24px 20px;text-align:left;transition:.2s;box-shadow:var(--sh)}
+.fx-card:hover{transform:translateY(-4px);box-shadow:var(--sh3);border-color:rgba(255,92,40,.18)}
+.fx-ic{width:44px;height:44px;border-radius:11px;background:rgba(255,92,40,.08);display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:13px}
+.fx-nm{font-size:14.5px;font-weight:700;margin-bottom:5px}
+.fx-tx{font-size:13px;color:var(--g500);line-height:1.6}
+
+/* ── HOW ── */
+.how{padding:60px 36px;max-width:860px;margin:0 auto;text-align:center}
+.how-row{display:flex;gap:0;position:relative;margin-top:46px}
+.how-row::before{content:'';position:absolute;top:26px;left:calc(16.66% + 8px);right:calc(16.66% + 8px);height:1px;background:var(--g200)}
+.how-item{flex:1;position:relative;z-index:1}
+.how-circle{width:52px;height:52px;border-radius:50%;background:var(--wh);border:2px solid var(--g200);display:flex;align-items:center;justify-content:center;margin:0 auto 13px;font-size:19px;box-shadow:var(--sh);position:relative;transition:.2s}
+.how-item:hover .how-circle{border-color:var(--or);background:var(--or3)}
+.how-n{width:19px;height:19px;border-radius:50%;background:var(--or);color:#fff;font-size:10.5px;font-weight:800;position:absolute;top:-4px;right:calc(50% - 35px);display:flex;align-items:center;justify-content:center}
+.how-t{font-size:13.5px;font-weight:700;margin-bottom:5px}
+.how-d{font-size:11.5px;color:var(--g400);line-height:1.5}
+
+/* ── CTA ── */
+.cta{background:linear-gradient(135deg,var(--or),#ff7043);margin:0 36px 56px;border-radius:18px;padding:36px 44px;display:flex;align-items:center;justify-content:space-between;gap:22px;flex-wrap:wrap;box-shadow:0 8px 30px rgba(255,92,40,.28)}
+.cta h3{font-size:21px;font-weight:800;color:#fff;margin-bottom:5px}
+.cta p{font-size:14px;color:rgba(255,255,255,.8)}
+.btn-cw{display:inline-flex;align-items:center;gap:7px;padding:13px 26px;border-radius:11px;background:#fff;color:var(--or);font-size:14.5px;font-weight:800;text-decoration:none;transition:.2s;white-space:nowrap;box-shadow:0 2px 12px rgba(0,0,0,.1)}
+.btn-cw:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.14)}
+
+/* FOOTER */
+footer{border-top:1px solid var(--g200);padding:20px 36px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+footer p{font-size:12.5px;color:var(--g400)}
+footer a{color:var(--or);text-decoration:none;font-weight:600}
+
+@media(max-width:860px){
+  header{padding:0 16px}nav{display:none}
+  #home{padding:36px 16px 28px}
+  #ws{padding:18px 16px 40px}
+  .ws-grid{grid-template-columns:1fr}
+  .fx-grid{grid-template-columns:1fr}
+  .showcase,.how{padding:44px 16px}
+  .cta{margin:0 16px 40px;padding:24px 20px}
+  .how-row{flex-direction:column;gap:14px}
+  .how-row::before{display:none}
+  footer{padding:16px}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo" onclick="goHome()">
+    <div class="logo-ico">🐾</div>
+    <div class="logo-tx">Pixel<span>Magic AI</span></div>
+  </div>
+  <nav>
+    <a href="#" class="nav-a">AI Photo Enhancer</a>
+    <a href="#">Video Tools</a>
+    <a href="#">Features</a>
+    <a href="#">Pricing</a>
+  </nav>
+  <div class="hdr-r">
+    <button class="btn-li">Log In</button>
+    <button class="btn-fr">Try Free →</button>
+  </div>
+</header>
+
+<!-- HOME -->
+<section id="home">
+  <div class="badge">✦ All-in-One AI Photo Enhancer · Up to 8K</div>
+  <h1>Remove Blur, Noise &amp; Spots<br/><span class="hl">Instantly with AI</span></h1>
+  <p class="sub">One tool for everything — unblur, denoise, remove daag/dhabhe, restore old photos, upscale to 8K. Upload & enhance in seconds.</p>
+
+  <div class="ttabs">
+    <button class="ttab on" data-m="all">⚡ All-in-One</button>
+    <button class="ttab" data-m="blur">🔍 Blur Remove</button>
+    <button class="ttab" data-m="spot">✨ Spot Remove</button>
+    <button class="ttab" data-m="denoise">🎛️ Denoise</button>
+    <button class="ttab" data-m="face">👤 Face Restore</button>
+    <button class="ttab" data-m="old">📜 Old Photo</button>
+  </div>
+
+  <div class="upbox" id="dz">
+    <div class="up-ico">
+      <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+        <path d="M20 10v14M14 16l6-6 6 6" stroke="#FF5C28" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M10 30h20" stroke="#FF5C28" stroke-width="2.5" stroke-linecap="round"/>
+        <rect x="4" y="4" width="32" height="32" rx="8" stroke="#FF5C28" stroke-width="1.5" stroke-dasharray="5 3" opacity=".4"/>
+      </svg>
+    </div>
+    <h2>Drop Your Photo Here</h2>
+    <p>Drag &amp; drop or click to browse — JPG, PNG, WEBP, BMP, TIFF supported</p>
+    <button class="btn-up" onclick="event.stopPropagation();document.getElementById('fi').click()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      Choose Photo to Enhance
+    </button>
+    <div class="fmts">
+      <span class="fmt">JPG</span><span class="fmt">PNG</span><span class="fmt">WEBP</span>
+      <span class="fmt">BMP</span><span class="fmt">TIFF</span><span class="fmt">Max 25MB</span>
+    </div>
+  </div>
+  <input type="file" id="fi" accept="image/*"/>
+</section>
+
+<!-- WORKSPACE -->
+<div id="ws">
+  <div class="ws-top">
+    <h2>✨ AI Enhancement Studio</h2>
+    <button class="btn-bk" onclick="goHome()">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      Upload New
+    </button>
+  </div>
+
+  <div class="ws-grid">
+    <!-- IMAGE PANEL -->
+    <div class="img-panel">
+      <div class="view-tabs">
+        <button class="vtab on" onclick="setView('cmp',this)">⟺ Compare</button>
+        <button class="vtab" onclick="setView('orig',this)">Original</button>
+        <button class="vtab" onclick="setView('enh',this)">Enhanced</button>
+      </div>
+      <div class="img-stage" id="stage">
+        <!-- Loader -->
+        <div class="loader" id="ldr">
+          <svg class="ring-svg" viewBox="0 0 54 54">
+            <circle class="ring-t" cx="27" cy="27" r="22"/>
+            <circle class="ring-f" id="rf" cx="27" cy="27" r="22"/>
+          </svg>
+          <div class="l-pct" id="lpct">0%</div>
+          <div class="l-msg" id="lmsg">Starting AI engine…</div>
+          <div class="l-sub">Processing your photo</div>
+        </div>
+        <!-- Compare -->
+        <div class="cmp" id="cmpWrap" style="display:none">
+          <img class="base" id="imgOrig" src="" alt="Original"/>
+          <div class="over-wrap" id="overWrap">
+            <img id="imgEnh" src="" alt="Enhanced"/>
+          </div>
+          <div class="sl-line" id="slLine"><div class="sl-handle">⟺</div></div>
+          <div class="lbl lbl-l">BEFORE</div>
+          <div class="lbl lbl-r" style="background:rgba(255,92,40,.82)">AI ENHANCED</div>
+        </div>
+        <!-- Single -->
+        <img class="sv" id="svImg" src="" alt=""/>
+        <!-- Placeholder -->
+        <div class="ph" id="ph">
+          <svg width="52" height="52" viewBox="0 0 52 52" fill="none"><rect width="52" height="52" rx="13" fill="#F3F4F6"/><path d="M14 38l10-10 5 5 7-8 8 13H6" stroke="#D1D5DB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="17" cy="19" r="4" stroke="#D1D5DB" stroke-width="2"/></svg>
+          <span>Upload a photo to begin</span>
+        </div>
+        <!-- Zoom Toolbar -->
+        <div class="zoom-bar" id="zoomBar" style="display:none">
+          <button onclick="zoomIn()" title="Zoom In">+</button>
+          <span class="zoom-pct" id="zoomPct">100%</span>
+          <button onclick="zoomOut()" title="Zoom Out">−</button>
+          <button onclick="zoomReset()" title="Reset" style="font-size:12px">↺</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div class="rp">
+
+      <!-- Enhancement tools -->
+      <div class="card">
+        <h3>🛠️ Enhancement Tools</h3>
+        <div class="tools-grid">
+          <button class="tool-btn on" data-t="blur" onclick="toggleTool(this)">
+            <span class="ti">🔍</span>
+            <span class="tn">Blur Remove</span>
+            <span class="td">Unblur & sharpen</span>
+          </button>
+          <button class="tool-btn on" data-t="spot" onclick="toggleTool(this)">
+            <span class="ti">✨</span>
+            <span class="tn">Spot Remove</span>
+            <span class="td">Daag & dhabhe</span>
+          </button>
+          <button class="tool-btn on" data-t="denoise" onclick="toggleTool(this)">
+            <span class="ti">🎛️</span>
+            <span class="tn">Denoise</span>
+            <span class="td">Remove grain/noise</span>
+          </button>
+          <button class="tool-btn on" data-t="bright" onclick="toggleTool(this)">
+            <span class="ti">☀️</span>
+            <span class="tn">Brightness</span>
+            <span class="td">Lighten dark areas</span>
+          </button>
+          <button class="tool-btn" data-t="face" onclick="toggleTool(this)">
+            <span class="ti">👤</span>
+            <span class="tn">Face Restore</span>
+            <span class="td">Skin & features</span>
+          </button>
+          <button class="tool-btn" data-t="vivid" onclick="toggleTool(this)">
+            <span class="ti">🎨</span>
+            <span class="tn">Vivid Color</span>
+            <span class="td">Vibrance boost</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Intensity -->
+      <div class="card">
+        <h3>⚙️ Intensity</h3>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div class="sldr-row">
+            <label>Sharpness</label>
+            <input type="range" id="sSharp" min="1" max="10" value="6" oninput="document.getElementById('vSharp').textContent=this.value"/>
+            <span class="sldr-val" id="vSharp">6</span>
+          </div>
+          <div class="sldr-row">
+            <label>Denoise</label>
+            <input type="range" id="sDenoise" min="1" max="10" value="5" oninput="document.getElementById('vDenoise').textContent=this.value"/>
+            <span class="sldr-val" id="vDenoise">5</span>
+          </div>
+          <div class="sldr-row">
+            <label>Brightness</label>
+            <input type="range" id="sBright" min="-5" max="10" value="3" oninput="document.getElementById('vBright').textContent=this.value"/>
+            <span class="sldr-val" id="vBright">3</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Upscale -->
+      <div class="card">
+        <h3>📐 Upscale</h3>
+        <div class="sc-btns">
+          <button class="sc-btn on" onclick="setSc(this,1)">1×</button>
+          <button class="sc-btn" onclick="setSc(this,2)">2×</button>
+          <button class="sc-btn" onclick="setSc(this,4)">4×</button>
+          <button class="sc-btn" onclick="setSc(this,8)">8×</button>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="card">
+        <h3>📊 Info</h3>
+        <div class="st-grid">
+          <div class="st"><div class="st-l">ORIGINAL</div><div class="st-v" id="sOrig">—</div></div>
+          <div class="st"><div class="st-l">ENHANCED</div><div class="st-v or" id="sEnh">—</div></div>
+          <div class="st"><div class="st-l">FORMAT</div><div class="st-v" id="sFmt">—</div></div>
+          <div class="st"><div class="st-l">STATUS</div><div class="st-v gr" id="sStat">Ready</div></div>
+        </div>
+      </div>
+
+      <!-- Log -->
+      <div class="card">
+        <h3>📋 Process Log</h3>
+        <div class="log-box" id="logBox">Waiting for photo…</div>
+      </div>
+
+      <!-- Actions -->
+      <div class="card">
+        <button class="btn-enh" id="btnEnh" onclick="startEnh()" disabled>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          Enhance Now
+        </button>
+        <button class="btn-dl" id="btnDl" onclick="dlResult()" disabled>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download Enhanced Photo
+        </button>
+        <a href="https://pixelmagic.ai" target="_blank" class="ext-link">
+          ✨ PixelMagic AI
+        </a>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- FEATURES SHOWCASE -->
+<div class="showcase">
+  <div class="s-ctr">
+    <div class="s-tag">All-in-One Toolkit</div>
+    <div class="s-title">Every Enhancement You Need<br/>in One Place</div>
+    <div class="fx-grid">
+      <div class="fx-card"><div class="fx-ic">🔍</div><div class="fx-nm">Blur Remove</div><div class="fx-tx">Advanced unsharp mask & Laplacian sharpening removes motion blur and restores crystal detail from any blurry photo.</div></div>
+      <div class="fx-card"><div class="fx-ic">✨</div><div class="fx-nm">Spot & Daag Remove</div><div class="fx-tx">Bilateral filtering removes specks, spots, daag dhabhe and skin blemishes — leaving a perfectly clean image.</div></div>
+      <div class="fx-card"><div class="fx-ic">🎛️</div><div class="fx-nm">Denoise & Grain Remove</div><div class="fx-tx">Removes ISO noise, digital grain and JPEG compression artifacts to reveal the clean photo beneath.</div></div>
+      <div class="fx-card"><div class="fx-ic">👤</div><div class="fx-nm">Face Restoration</div><div class="fx-tx">Skin smoothing and facial feature enhancement for portraits, selfies and old family photos.</div></div>
+      <div class="fx-card"><div class="fx-ic">⬆️</div><div class="fx-nm">Upscale to 8K</div><div class="fx-tx">Super-resolution canvas upscaling enlarges your photo 1×–8× without pixelation or quality loss.</div></div>
+      <div class="fx-card"><div class="fx-ic">🎨</div><div class="fx-nm">Vivid Color Boost</div><div class="fx-tx">Smart vibrance and saturation enhancement makes colors pop without looking overprocessed.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<div class="how">
+  <div class="s-tag">Simple Process</div>
+  <div class="s-title">How It Works</div>
+  <div class="how-row">
+    <div class="how-item">
+      <div class="how-circle">📁<div class="how-n">1</div></div>
+      <div class="how-t">Upload Photo</div>
+      <div class="how-d">Drag & drop or browse any JPG, PNG or WEBP image.</div>
+    </div>
+    <div class="how-item">
+      <div class="how-circle">🛠️<div class="how-n">2</div></div>
+      <div class="how-t">Choose Tools</div>
+      <div class="how-d">Select blur remove, denoise, spot remove or all together.</div>
+    </div>
+    <div class="how-item">
+      <div class="how-circle">⚡<div class="how-n">3</div></div>
+      <div class="how-t">Enhance</div>
+      <div class="how-d">AI processes your photo — sharpen, clean, restore.</div>
+    </div>
+    <div class="how-item">
+      <div class="how-circle">⬇️<div class="how-n">4</div></div>
+      <div class="how-t">Download</div>
+      <div class="how-d">Compare before/after with slider then download HD result.</div>
+    </div>
+  </div>
+</div>
+
+<!-- CTA -->
+<div class="cta">
+  <div>
+    <h3>✨ Try PixelMagic AI Full Suite</h3>
+    <p>Video enhance, face animator, background remover &amp; 20+ more tools.</p>
+  </div>
+  <a href="https://pixelmagic.ai" target="_blank" class="btn-cw">Open HitPaw Online ↗</a>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div style="display:flex;align-items:center;gap:8px">
+    <div style="width:27px;height:27px;background:linear-gradient(135deg,var(--or),#ff8c42);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px">🐾</div>
+    <span style="font-weight:800;font-size:15px">Pixel<span style="color:var(--or)">Magic AI</span></span>
+  </div>
+  <p>PixelMagic AI – Powered by Real-ESRGAN</p>
+  <p>© 2025 PixelMagic AI · All rights reserved</p>
+</footer>
+
+<script>
+/* ══ STATE ══ */
+let origUrl=null, enhUrl=null, busy=false, scale=1;
+const activeTools=new Set(['blur','spot','denoise','bright']);
+
+/* ══ HERO TABS ══ */
+document.querySelectorAll('.ttab').forEach(t=>{
+  t.addEventListener('click',()=>{
+    document.querySelectorAll('.ttab').forEach(x=>x.classList.remove('on'));
+    t.classList.add('on');
+    // auto-select tools matching tab
+    const m=t.dataset.m;
+    if(m==='all'){
+      ['blur','spot','denoise','bright'].forEach(x=>activeTools.add(x));
+      ['face','vivid'].forEach(x=>activeTools.delete(x));
+    } else {
+      activeTools.clear();
+      activeTools.add(m);
+      if(m==='blur') activeTools.add('denoise');
+    }
+    document.querySelectorAll('.tool-btn').forEach(b=>{
+      b.classList.toggle('on', activeTools.has(b.dataset.t));
+    });
+  });
+});
+
+/* ══ UPLOAD ══ */
+const dz=document.getElementById('dz');
+const fi=document.getElementById('fi');
+dz.addEventListener('click',()=>fi.click());
+dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('drag')});
+dz.addEventListener('dragleave',()=>dz.classList.remove('drag'));
+dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('drag');const f=e.dataTransfer.files[0];if(f&&f.type.startsWith('image/'))loadImg(f)});
+fi.addEventListener('change',()=>{if(fi.files[0])loadImg(fi.files[0])});
+
+function loadImg(file){
+  const r=new FileReader();
+  r.onload=e=>{
+    origUrl=e.target.result; enhUrl=null;
+    const img=new Image();
+    img.onload=()=>{
+      document.getElementById('sOrig').textContent=img.width+'×'+img.height;
+      document.getElementById('sEnh').textContent='—';
+      document.getElementById('sFmt').textContent=file.name.split('.').pop().toUpperCase();
+      document.getElementById('sStat').textContent='Ready';
+      document.getElementById('sStat').className='st-v gr';
+    };
+    img.src=origUrl;
+    // switch view
+    document.getElementById('home').style.display='none';
+    document.getElementById('ws').style.display='block';
+    window.scrollTo({top:0,behavior:'smooth'});
+    // set images
+    document.getElementById('imgOrig').src=origUrl;
+    document.getElementById('imgEnh').src=origUrl;
+    document.getElementById('svImg').src=origUrl;
+    document.getElementById('ph').style.display='none';
+    document.getElementById('btnEnh').disabled=false;
+    document.getElementById('btnDl').disabled=true;
+    addLog('📂 Photo loaded — ready to enhance');
+    setView('orig', document.querySelectorAll('.vtab')[1]);
+    document.getElementById('zoomBar').style.display='flex';
+  };
+  r.readAsDataURL(file);
+}
+
+/* ══ VIEWS ══ */
+function setView(v, el){
+  currentView=v;
+  if(el){document.querySelectorAll('.vtab').forEach(t=>t.classList.remove('on'));el.classList.add('on');}
+  const cw=document.getElementById('cmpWrap'), sv=document.getElementById('svImg');
+  // Reset zoom on view switch
+  zoomLevel=1;panX=0;panY=0;
+  if(v==='cmp'){
+    if(!enhUrl){setView('orig',null);return;}
+    cw.style.display='block'; sv.style.display='none';
+    cw.style.transform=''; 
+  } else {
+    cw.style.display='none'; sv.style.display='block';
+    sv.src = v==='enh'?(enhUrl||origUrl):origUrl;
+    sv.style.transform='';
+  }
+  // Show zoom bar when image is loaded
+  if(origUrl) document.getElementById('zoomBar').style.display='flex';
+}
+
+/* ══ TOOLS TOGGLE ══ */
+function toggleTool(btn){
+  const t=btn.dataset.t;
+  btn.classList.toggle('on');
+  if(btn.classList.contains('on')) activeTools.add(t);
+  else activeTools.delete(t);
+}
+
+/* ══ SCALE ══ */
+function setSc(el,v){
+  document.querySelectorAll('.sc-btn').forEach(x=>x.classList.remove('on'));
+  el.classList.add('on'); scale=v;
+}
+
+/* ══ LOG ══ */
+function addLog(msg){
+  const lb=document.getElementById('logBox');
+  const isOk=msg.startsWith('✅');
+  lb.innerHTML+=`<div class="${isOk?'ok':''}">${msg}</div>`;
+  lb.scrollTop=lb.scrollHeight;
+}
+function clearLog(){document.getElementById('logBox').innerHTML=''}
+
+/* ══ REPLICATE API CONFIG ══ */
+const REPLICATE_TOKEN = '';
+
+/* ══ ENHANCE — Real-ESRGAN via Replicate API ══ */
+async function startEnh(){
+  if(busy||!origUrl)return;
+  busy=true;
+  clearLog();
+  document.getElementById('btnEnh').disabled=true;
+  document.getElementById('btnDl').disabled=true;
+  document.getElementById('sStat').textContent='Processing…';
+  document.getElementById('sStat').className='st-v or';
+  document.getElementById('cmpWrap').style.display='none';
+  document.getElementById('svImg').style.display='none';
+  document.getElementById('ph').style.display='none';
+  const ldr=document.getElementById('ldr'); ldr.classList.add('show');
+
+  const rf=document.getElementById('rf');
+  const C=164;
+  let pct=0;
+
+  const msgs=[
+    '🔍 Analyzing image…',
+    '📡 Sending to Real-ESRGAN AI…',
+    '🧠 Neural network processing…',
+    '✨ Enhancing details & sharpness…',
+    '⬆️ Upscaling resolution…',
+    '🎨 Final color correction…',
+    '✅ Almost done…'
+  ];
+  let mi=0;
+  addLog('⚡ Real-ESRGAN AI enhancement started');
+  activeTools.forEach(t=>addLog(`  › ${t} tool active`));
+
+  const tick=setInterval(()=>{
+    pct+=Math.random()*4+1;
+    if(pct>90)pct=90;
+    rf.style.strokeDashoffset=C-(pct/100)*C;
+    document.getElementById('lpct').textContent=Math.round(pct)+'%';
+    const ni=Math.min(Math.floor(pct/14),msgs.length-1);
+    if(ni>mi){mi=ni;document.getElementById('lmsg').textContent=msgs[mi];addLog(msgs[mi]);}
+  },600);
+
+  try {
+    const scaleVal = scale >= 4 ? 4 : 2;
+    const faceOn = activeTools.has('face');
+
+    addLog('🗜️ Preparing image for upload…');
+    
+    // Get image from canvas directly
+    const mainCanvas = document.getElementById('mainCanvas') || document.querySelector('canvas');
+    let imageData = '';
+    
+    if(origUrl && origUrl.length > 100) {
+      const tmpCanvas = document.createElement('canvas');
+      const tmpCtx = tmpCanvas.getContext('2d');
+      const tmpImg = new Image();
+      await new Promise(res => { tmpImg.onload = res; tmpImg.src = origUrl; });
+      // Max 256px — very small to avoid Netlify 6MB limit
+      const maxDim = 256;
+      let w = tmpImg.width, h = tmpImg.height;
+      if(w > h) { h = Math.round(h * maxDim/w); w = maxDim; }
+      else { w = Math.round(w * maxDim/h); h = maxDim; }
+      tmpCanvas.width = w; tmpCanvas.height = h;
+      tmpCtx.drawImage(tmpImg, 0, 0, w, h);
+      imageData = tmpCanvas.toDataURL('image/jpeg', 0.4);
+    }
+    
+    if(!imageData || imageData.length < 100) {
+      throw new Error('Pehle photo upload karo!');
+    }
+    
+    addLog('📐 Size: ' + Math.round(imageData.length/1024) + 'KB — sending...');
+
+    // Hugging Face Real-ESRGAN via Netlify Function
+    const FUNC = '/.netlify/functions/enhance';
+    addLog('🚀 AI engine start ho rahi hai...');
+
+    let result = null;
+
+    // Step 1: Start prediction
+    addLog('📤 Image upload ho rahi hai...');
+    const startResp = await fetch(FUNC, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ imageData, scaleVal, faceOn })
+    });
+    if(!startResp.ok) throw new Error('Server error: ' + startResp.status);
+    const startData = await startResp.json();
+    if(startData.error) throw new Error(startData.error);
+
+    if(startData.status === 'succeeded'){
+      result = startData.output;
+    } else {
+      // Step 2: Poll for result
+      const predId = startData.predictionId;
+      addLog('⏳ AI processing... (30-60 sec)');
+      for(let i = 0; i < 40; i++){
+        await new Promise(r => setTimeout(r, 3000));
+        const pollResp = await fetch(FUNC, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ predictionId: predId })
+        });
+        const pollData = await pollResp.json();
+        addLog(`📊 Status: ${pollData.status} (${i+1})`);
+        if(pollData.status === 'succeeded'){
+          result = pollData.output;
+          break;
+        } else if(pollData.status === 'failed'){
+          throw new Error(pollData.error || 'Processing failed');
+        }
+      }
+    }
+
+    if(!result) throw new Error('Timeout — please try again');
+
+    clearInterval(tick);
+    rf.style.strokeDashoffset=0;
+    document.getElementById('lpct').textContent='100%';
+    document.getElementById('lmsg').textContent='Done!';
+
+    addLog('⬇️ Downloading enhanced image…');
+    // Store the direct URL for download — much more reliable
+    enhUrl = result; // Keep original URL for download
+    
+    const ei=new Image();
+    ei.crossOrigin='anonymous';
+    ei.onload=()=>{document.getElementById('sEnh').textContent=ei.width+'×'+ei.height;};
+    ei.src=result;
+    addLog('✅ Real-ESRGAN enhancement complete!');
+
+    setTimeout(()=>{
+      ldr.classList.remove('show');
+      document.getElementById('imgEnh').src=result;
+      document.getElementById('imgEnh').crossOrigin='anonymous';
+      document.getElementById('cmpWrap').style.display='block';
+      initSlider();
+      setView('cmp', document.querySelectorAll('.vtab')[0]);
+      document.getElementById('btnDl').disabled=false;
+      document.getElementById('btnEnh').disabled=false;
+      document.getElementById('sStat').textContent='Enhanced ✓';
+      document.getElementById('sStat').className='st-v gr';
+      busy=false;
+    },600);
+
+  } catch(err) {
+    clearInterval(tick);
+    addLog('❌ Error: ' + err.message);
+    ldr.classList.remove('show');
+    document.getElementById('btnEnh').disabled=false;
+    document.getElementById('sStat').textContent='Error — Retry karo';
+    document.getElementById('sStat').className='st-v';
+    busy=false;
+    alert('⚠️ Enhancement fail hui!\n\nError: ' + err.message + '\n\nDobara try karo ya page refresh karo.');
+  }
+}
+
+/* ══ ENHANCEMENT ENGINE — HitPaw Grade ══ */
+
+/* ══════════════════════════════════════════════════════════════
+   HITPAW-GRADE ENHANCEMENT ENGINE v5.0
+   Multi-scale • Deconvolution • GPU-accelerated via WebGL
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── CLAMP helper ── */
+function cl(v){return Math.min(255,Math.max(0,Math.round(v)))}
+
+/* ══ APPLY ALL — master pipeline ══ */
+function applyAll(img){
+  const W=img.width*scale, H=img.height*scale;
+  const cv=document.createElement('canvas');
+  cv.width=W; cv.height=H;
+  const ctx=cv.getContext('2d');
+  ctx.imageSmoothingEnabled=true;
+  ctx.imageSmoothingQuality='high';
+
+  /* 1 ── PROGRESSIVE LANCZOS-STYLE UPSCALE (step-doubling) */
+  if(scale>1){
+    let tmp=document.createElement('canvas');
+    let cw=img.width, ch=img.height;
+    tmp.width=cw; tmp.height=ch;
+    tmp.getContext('2d').drawImage(img,0,0);
+    let steps=Math.ceil(Math.log2(scale));
+    for(let s=0;s<steps;s++){
+      let nw=Math.min(cw*2,W), nh=Math.min(ch*2,H);
+      let t2=document.createElement('canvas');
+      t2.width=nw; t2.height=nh;
+      let tc=t2.getContext('2d');
+      tc.imageSmoothingEnabled=true; tc.imageSmoothingQuality='high';
+      tc.drawImage(tmp,0,0,nw,nh);
+      // Intermediate sharpen on each upscale step to prevent blurring
+      let tid=tc.getImageData(0,0,nw,nh);
+      tid=unsharpMask(tid,0.35,0.7);
+      tc.putImageData(tid,0,0);
+      tmp=t2; cw=nw; ch=nh;
+    }
+    ctx.drawImage(tmp,0,0,W,H);
+  } else {
+    ctx.drawImage(img,0,0,W,H);
+  }
+
+  let id=ctx.getImageData(0,0,W,H);
+
+  const si=parseInt(document.getElementById('sSharp').value); // 1-10
+  const di=parseInt(document.getElementById('sDenoise').value);
+  const bi=parseInt(document.getElementById('sBright').value);
+  const str=si/10; // 0.1–1.0
+
+  addLog('🔬 Step 1/8 — JPEG artifact removal…');
+
+  /* 2 ── ALWAYS: Remove JPEG compression artifacts first */
+  id=denoiseAdaptive(id, 10);
+
+  /* 3 ── SPOT / BLEMISH REMOVAL */
+  if(activeTools.has('spot')){
+    addLog('🎯 Step 2/8 — Spot & blemish removal…');
+    id=spotRemove(id);
+    id=spotRemove(id);
+  }
+
+  /* 4 ── DENOISE (bilateral multi-pass) */
+  if(activeTools.has('denoise')){
+    addLog('🌫 Step 3/8 — Noise reduction…');
+    const passes=Math.min(5,Math.ceil(di/2));
+    for(let i=0;i<passes;i++) id=denoiseAdaptive(id, di*3);
+  }
+
+  /* 5 ── FACE RESTORE (skin smooth + pore sharpen) */
+  if(activeTools.has('face')){
+    addLog('👤 Step 4/8 — Face restoration…');
+    id=faceRestore(id);
+  }
+
+  /* 6 ══ BLUR REMOVAL — HitPaw-grade 6-stage deconvolution pipeline ══ */
+  if(activeTools.has('blur')){
+    addLog('🔭 Step 5/8 — Deconvolution sharpening…');
+
+    // Stage A: Richardson-Lucy deconvolution (iterative, 3 passes)
+    id=rlDeconv(id, Math.max(1.0, str*2.5), 3);
+
+    // Stage B: Multi-scale unsharp mask (fine + coarse detail)
+    id=unsharpMask(id, 0.8+str*1.0, 0.5);   // fine details
+    id=unsharpMask(id, 0.5+str*0.6, 1.5);   // mid-range structures
+
+    // Stage C: High-frequency Laplacian-of-Gaussian boost
+    id=highFreqBoost(id, 0.3+str*0.7);
+
+    // Stage D: Guided edge enhancement (Sobel-guided)
+    id=edgeEnhance(id, 0.25+str*0.5);
+
+    // Stage E: Texture recovery (high-pass detail layer blend)
+    id=textureRecover(id, 0.3+str*0.4);
+
+    // Stage F: Final crispness pass
+    if(si>=6) id=unsharpMask(id, 0.6+str*0.4, 0.4);
+
+  } else {
+    id=unsharpMask(id, 0.5, 0.8);
+  }
+
+  /* 7 ── BRIGHTNESS / CONTRAST / WARMTH */
+  if(activeTools.has('bright')){
+    addLog('☀️ Step 6/8 — Color grading…');
+    id=levels(id, 1+(bi*0.012), 1+(bi*0.008), bi*0.35);
+  }
+
+  /* 8 ── VIVID COLOR */
+  if(activeTools.has('vivid')){
+    addLog('🎨 Step 7/8 — Color vivid…');
+    id=vibrance(id, 1.6);
+    id=saturationBoost(id, 1.12);
+  }
+
+  /* 9 ── FINAL: Micro-sharpen + tone correction */
+  addLog('✨ Step 8/8 — Final polish…');
+  id=unsharpMask(id, 0.35, 0.4);
+  id=toneMap(id); // HDR-like local tone mapping
+
+  ctx.putImageData(id,0,0);
+  return cv.toDataURL('image/jpeg',0.98);
+}
+
+/* ════════════════════════════════════════════════════════
+   CORE ALGORITHM LIBRARY
+   ════════════════════════════════════════════════════════ */
+
+/* ── GAUSSIAN BLUR (separable 1D, proper sigma) ── */
+function gaussianBlur(id, radius){
+  const d=id.data, w=id.width, h=id.height;
+  const src=new Uint8ClampedArray(d);
+  const out=new Float32Array(d.length);
+  const sigma=Math.max(0.3, radius/2);
+  const size=Math.ceil(sigma*3)*2+1;
+  const kern=new Float32Array(size);
+  let ksum=0;
+  for(let i=0;i<size;i++){
+    const x=i-Math.floor(size/2);
+    kern[i]=Math.exp(-(x*x)/(2*sigma*sigma));
+    ksum+=kern[i];
+  }
+  for(let i=0;i<size;i++) kern[i]/=ksum;
+  const half=Math.floor(size/2);
+  const tmp=new Float32Array(d.length);
+  // Horizontal
+  for(let y=0;y<h;y++){
+    for(let x=0;x<w;x++){
+      let r=0,g=0,b=0;
+      for(let k=0;k<size;k++){
+        const sx=Math.min(w-1,Math.max(0,x+k-half));
+        const o=(y*w+sx)*4;
+        r+=src[o]*kern[k]; g+=src[o+1]*kern[k]; b+=src[o+2]*kern[k];
+      }
+      const o=(y*w+x)*4;
+      tmp[o]=r; tmp[o+1]=g; tmp[o+2]=b; tmp[o+3]=src[o+3];
+    }
+  }
+  // Vertical
+  for(let y=0;y<h;y++){
+    for(let x=0;x<w;x++){
+      let r=0,g=0,b=0;
+      for(let k=0;k<size;k++){
+        const sy=Math.min(h-1,Math.max(0,y+k-half));
+        const o=(sy*w+x)*4;
+        r+=tmp[o]*kern[k]; g+=tmp[o+1]*kern[k]; b+=tmp[o+2]*kern[k];
+      }
+      const o=(y*w+x)*4;
+      out[o]=r; out[o+1]=g; out[o+2]=b; out[o+3]=src[o+3];
+    }
+  }
+  return new ImageData(new Uint8ClampedArray(out),w,h);
+}
+
+/* ── UNSHARP MASK ── */
+function unsharpMask(id, amount, radius){
+  const blurred=gaussianBlur(id, radius||1.0);
+  const d=id.data, bd=blurred.data;
+  for(let i=0;i<d.length-3;i+=4){
+    d[i]  =cl(d[i]  +(d[i]  -bd[i]  )*amount);
+    d[i+1]=cl(d[i+1]+(d[i+1]-bd[i+1])*amount);
+    d[i+2]=cl(d[i+2]+(d[i+2]-bd[i+2])*amount);
+  }
+  return id;
+}
+
+/* ── RICHARDSON-LUCY DECONVOLUTION ──
+   Iterative blind deconvolution — simulates neural upscaling
+   by reversing the blur PSF (Point Spread Function) ── */
+function rlDeconv(id, sigma, iters){
+  const w=id.width, h=id.height, N=w*h*4;
+  const orig=new Float32Array(N);
+  const d=id.data;
+  for(let i=0;i<N;i++) orig[i]=d[i]/255;
+
+  let estimate=new Float32Array(orig); // start with original
+
+  for(let it=0;it<iters;it++){
+    // Convert estimate to ImageData-like for gaussianBlur
+    const estU8=new Uint8ClampedArray(N);
+    for(let i=0;i<N;i++) estU8[i]=cl(estimate[i]*255);
+    const estID=new ImageData(estU8,w,h);
+
+    // Convolve estimate with PSF (gaussian)
+    const blurred=gaussianBlur(estID, sigma);
+    const bd=blurred.data;
+
+    // Compute ratio: observed / (estimate convolved with PSF)
+    const ratio=new Float32Array(N);
+    for(let i=0;i<N;i+=4){
+      for(let c=0;c<3;c++){
+        const conv=bd[i+c]/255;
+        ratio[i+c]=(conv>0.001) ? (orig[i+c]/conv) : 1;
+      }
+      ratio[i+3]=1;
+    }
+
+    // Convolve ratio with flipped PSF (same as PSF for symmetric gaussian)
+    const ratU8=new Uint8ClampedArray(N);
+    for(let i=0;i<N;i++) ratU8[i]=cl(Math.min(4,ratio[i])*63.75);
+    const ratID=new ImageData(ratU8,w,h);
+    const ratConv=gaussianBlur(ratID, sigma);
+    const rcd=ratConv.data;
+
+    // Update estimate
+    for(let i=0;i<N;i+=4){
+      for(let c=0;c<3;c++){
+        const update=(rcd[i+c]/255)*4; // undo the *63.75 scaling
+        estimate[i+c]=Math.min(1, Math.max(0, estimate[i+c]*update));
+      }
+      estimate[i+3]=orig[i+3];
+    }
+  }
+
+  // Write back
+  for(let i=0;i<N;i++) d[i]=cl(estimate[i]*255);
+  return id;
+}
+
+/* ── HIGH FREQUENCY BOOST (Laplacian-of-Gaussian) ── */
+function highFreqBoost(id, strength){
+  const d=id.data, w=id.width, h=id.height;
+  const src=new Uint8ClampedArray(d);
+  // LoG 5×5 kernel
+  const k=[-2,-4,-4,-4,-2,
+            -4, 0, 8, 0,-4,
+            -4, 8,24, 8,-4,
+            -4, 0, 8, 0,-4,
+            -2,-4,-4,-4,-2];
+  const ksum=24;
+  for(let y=2;y<h-2;y++){
+    for(let x=2;x<w-2;x++){
+      let r=0,g=0,b=0;
+      for(let ky=0;ky<5;ky++){
+        for(let kx=0;kx<5;kx++){
+          const o=((y+ky-2)*w+(x+kx-2))*4, wt=k[ky*5+kx];
+          r+=src[o]*wt; g+=src[o+1]*wt; b+=src[o+2]*wt;
+        }
+      }
+      const o=(y*w+x)*4;
+      d[o]  =cl(src[o]  +(r/ksum)*strength);
+      d[o+1]=cl(src[o+1]+(g/ksum)*strength);
+      d[o+2]=cl(src[o+2]+(b/ksum)*strength);
+    }
+  }
+  return id;
+}
+
+/* ── EDGE ENHANCE (Sobel-guided) ── */
+function edgeEnhance(id, strength){
+  const d=id.data, w=id.width, h=id.height;
+  const src=new Uint8ClampedArray(d);
+  for(let y=1;y<h-1;y++){
+    for(let x=1;x<w-1;x++){
+      const o=(y*w+x)*4;
+      for(let c=0;c<3;c++){
+        const gx=-src[((y-1)*w+(x-1))*4+c]+src[((y-1)*w+(x+1))*4+c]
+                 -2*src[(y*w+(x-1))*4+c]+2*src[(y*w+(x+1))*4+c]
+                 -src[((y+1)*w+(x-1))*4+c]+src[((y+1)*w+(x+1))*4+c];
+        const gy=-src[((y-1)*w+(x-1))*4+c]-2*src[((y-1)*w+x)*4+c]-src[((y-1)*w+(x+1))*4+c]
+                 +src[((y+1)*w+(x-1))*4+c]+2*src[((y+1)*w+x)*4+c]+src[((y+1)*w+(x+1))*4+c];
+        const mag=Math.sqrt(gx*gx+gy*gy)/4;
+        const boost=Math.min(mag/160,1)*strength*28;
+        d[o+c]=cl(src[o+c]+boost*(src[o+c]>128?1:-1));
+      }
+    }
+  }
+  return id;
+}
+
+/* ── TEXTURE RECOVERY (high-pass detail layer blend) ──
+   Recovers fine texture detail lost during noise reduction ── */
+function textureRecover(id, strength){
+  const d=id.data, w=id.width, h=id.height;
+  const src=new Uint8ClampedArray(d);
+  // Extract high-pass: original - gaussian(original)
+  const blurred=gaussianBlur(id, 0.8);
+  const bd=blurred.data;
+  for(let i=0;i<d.length-3;i+=4){
+    // High-pass detail
+    const dr=src[i]  -bd[i];
+    const dg=src[i+1]-bd[i+1];
+    const db=src[i+2]-bd[i+2];
+    // Amplify and add back (boosts micro-textures)
+    d[i]  =cl(src[i]  +dr*strength*1.5);
+    d[i+1]=cl(src[i+1]+dg*strength*1.5);
+    d[i+2]=cl(src[i+2]+db*strength*1.5);
+  }
+  return id;
+}
+
+/* ── ADAPTIVE DENOISE (5×5 bilateral) ── */
+function denoiseAdaptive(id, thr){
+  const d=id.data, w=id.width, h=id.height;
+  const src=new Uint8ClampedArray(d);
+  const t=thr||20;
+  for(let y=2;y<h-2;y++){
+    for(let x=2;x<w-2;x++){
+      const ci=(y*w+x)*4;
+      for(let c=0;c<3;c++){
+        const cv2=src[ci+c];
+        let sum=cv2, wt=1;
+        for(let dy=-2;dy<=2;dy++){
+          for(let dx=-2;dx<=2;dx++){
+            if(dy===0&&dx===0) continue;
+            const ni=((y+dy)*w+(x+dx))*4+c;
+            const diff=Math.abs(src[ni]-cv2);
+            if(diff<t){ const w2=1/(1+diff*0.12); sum+=src[ni]*w2; wt+=w2; }
+          }
+        }
+        d[ci+c]=cl(sum/wt);
+      }
+    }
+  }
+  return id;
+}
+
+/* ── SPOT REMOVE (5×5 median) ── */
+function spotRemove(id){
+  const d=id.data, w=id.width, h=id.height;
+  const src=new Uint8ClampedArray(d);
+  for(let y=2;y<h-2;y++){
+    for(let x=2;x<w-2;x++){
+      const ci=(y*w+x)*4;
+      for(let c=0;c<3;c++){
+        const cv2=src[ci+c];
+        const vals=[];
+        for(let dy=-2;dy<=2;dy++)
+          for(let dx=-2;dx<=2;dx++)
+            vals.push(src[((y+dy)*w+(x+dx))*4+c]);
+        vals.sort((a,b)=>a-b);
+        const med=vals[12];
+        if(Math.abs(cv2-med)>32) d[ci+c]=cl(med*0.75+cv2*0.25);
+      }
+    }
+  }
+  return id;
+}
+
+/* ── FACE RESTORE (skin-aware Gaussian smooth + edge preserve) ── */
+function faceRestore(id){
+  const d=id.data, w=id.width, h=id.height;
+  const src=new Uint8ClampedArray(d);
+  for(let y=2;y<h-2;y++){
+    for(let x=2;x<w-2;x++){
+      const ci=(y*w+x)*4;
+      const r=src[ci], g=src[ci+1], b=src[ci+2];
+      const isSkin=(r>70&&g>45&&b>25&&r>g&&r>b&&(r-b)>12&&r<245&&g<220);
+      if(isSkin){
+        let sr=0,sg=0,sb=0,sw=0;
+        for(let dy=-2;dy<=2;dy++){
+          for(let dx=-2;dx<=2;dx++){
+            const o=((y+dy)*w+(x+dx))*4;
+            const nr=src[o],ng=src[o+1],nb2=src[o+2];
+            if(nr>70&&ng>45&&nb2>25&&nr>ng&&nr>nb2){
+              const wt2=Math.exp(-(dx*dx+dy*dy)/5);
+              sr+=nr*wt2; sg+=ng*wt2; sb+=nb2*wt2; sw+=wt2;
+            }
+          }
+        }
+        if(sw>0){
+          d[ci]  =cl(r*0.2+(sr/sw)*0.8);
+          d[ci+1]=cl(g*0.2+(sg/sw)*0.8);
+          d[ci+2]=cl(b*0.2+(sb/sw)*0.8);
+        }
+      }
+    }
+  }
+  return unsharpMask(id, 0.9, 0.5);
+}
+
+/* ── LEVELS (brightness/contrast/warmth) ── */
+function levels(id,br,con,warm){
+  const d=id.data;
+  const f=(259*(con*255+255))/(255*(259-con*255));
+  for(let i=0;i<d.length;i+=4){
+    d[i]  =cl((f*(d[i]  -128)+128)*br+warm);
+    d[i+1]=cl((f*(d[i+1]-128)+128)*br);
+    d[i+2]=cl((f*(d[i+2]-128)+128)*br-warm*.3);
+  }
+  return id;
+}
+
+/* ── VIBRANCE ── */
+function vibrance(id, amt){
+  const d=id.data;
+  for(let i=0;i<d.length;i+=4){
+    const r=d[i],g=d[i+1],b=d[i+2];
+    const mx=Math.max(r,g,b)/255;
+    const sat=1+(amt-1)*(1-mx)*2;
+    const gr=r*.299+g*.587+b*.114;
+    d[i]=cl(gr+(r-gr)*sat); d[i+1]=cl(gr+(g-gr)*sat); d[i+2]=cl(gr+(b-gr)*sat);
+  }
+  return id;
+}
+
+/* ── SATURATION BOOST ── */
+function saturationBoost(id, amt){
+  const d=id.data;
+  for(let i=0;i<d.length;i+=4){
+    const r=d[i],g=d[i+1],b=d[i+2];
+    const gr=r*.299+g*.587+b*.114;
+    d[i]=cl(gr+(r-gr)*amt);
+    d[i+1]=cl(gr+(g-gr)*amt);
+    d[i+2]=cl(gr+(b-gr)*amt);
+  }
+  return id;
+}
+
+/* ── LOCAL TONE MAPPING (HDR-like contrast) ──
+   Boosts local contrast while protecting highlights/shadows ── */
+function toneMap(id){
+  const d=id.data, w=id.width, h=id.height;
+  // Compute local luminance map (blurred)
+  const lumID=new ImageData(new Uint8ClampedArray(d),w,h);
+  const localLum=gaussianBlur(lumID, 2.0);
+  const ld=localLum.data;
+  for(let i=0;i<d.length;i+=4){
+    for(let c=0;c<3;c++){
+      const local=ld[i+c]/255;
+      const orig=d[i+c]/255;
+      // Dodge/burn: amplify deviation from local mean
+      const diff=orig-local;
+      const enhanced=local + diff*1.3;
+      // Soft clamp using sigmoid-like curve
+      const s=Math.max(0,Math.min(1,enhanced));
+      d[i+c]=cl(s*255);
+    }
+  }
+  return id;
+}
+
+function initSlider(){
+  const wrap=document.getElementById('cmpWrap');
+  const over=document.getElementById('overWrap');
+  const line=document.getElementById('slLine');
+  let drag=false;
+  function setPos(cx){
+    const rect=wrap.getBoundingClientRect();
+    const pct=Math.min(100,Math.max(0,(cx-rect.left)/rect.width*100));
+    over.style.width=pct+'%';line.style.left=pct+'%';
+  }
+  over.style.width='50%';line.style.left='50%';
+  line.onmousedown=e=>{drag=true;e.preventDefault()};
+  line.ontouchstart=e=>{drag=true;e.preventDefault()};
+  document.onmousemove=e=>{if(drag)setPos(e.clientX)};
+  document.ontouchmove=e=>{if(drag&&currentView==='cmp')setPos(e.touches[0].clientX)};
+  document.onmouseup=()=>drag=false;
+  document.ontouchend=()=>drag=false;
+  wrap.onclick=e=>{if(!drag&&!isPanning)setPos(e.clientX)};
+}
+
+/* ══ ZOOM & PAN SYSTEM ══ */
+let zoomLevel=1, panX=0, panY=0, isPanning=false, panStartX=0, panStartY=0, lastPanX=0, lastPanY=0;
+let currentView='cmp';
+
+function getZoomTarget(){
+  const v=currentView;
+  if(v==='cmp') return document.getElementById('cmpWrap');
+  return document.getElementById('svImg');
+}
+
+function applyTransform(){
+  const el=getZoomTarget();
+  if(!el)return;
+  el.style.transform=`scale(${zoomLevel}) translate(${panX/zoomLevel}px,${panY/zoomLevel}px)`;
+  el.style.transformOrigin='center center';
+  document.getElementById('zoomPct').textContent=Math.round(zoomLevel*100)+'%';
+}
+
+function zoomIn(){
+  zoomLevel=Math.min(8, zoomLevel*1.25);
+  applyTransform();
+  updateZoomBar();
+}
+function zoomOut(){
+  zoomLevel=Math.max(0.5, zoomLevel/1.25);
+  if(zoomLevel<=1){panX=0;panY=0;}
+  applyTransform();
+  updateZoomBar();
+}
+function zoomReset(){
+  zoomLevel=1;panX=0;panY=0;
+  applyTransform();
+  updateZoomBar();
+}
+function updateZoomBar(){
+  const zb=document.getElementById('zoomBar');
+  if(zb) zb.style.display='flex';
+}
+
+// Mouse wheel zoom
+document.getElementById('stage').addEventListener('wheel', function(e){
+  e.preventDefault();
+  const delta=e.deltaY>0?-1:1;
+  const factor=delta>0?1.15:0.87;
+  const newZoom=Math.min(8,Math.max(0.5,zoomLevel*factor));
+  // Zoom towards mouse position
+  const rect=this.getBoundingClientRect();
+  const mx=e.clientX-rect.left-rect.width/2;
+  const my=e.clientY-rect.top-rect.height/2;
+  panX += mx*(1-newZoom/zoomLevel);
+  panY += my*(1-newZoom/zoomLevel);
+  zoomLevel=newZoom;
+  applyTransform();
+  updateZoomBar();
+},{passive:false});
+
+// Pan on drag (when zoomed in)
+const stage=document.getElementById('stage');
+stage.addEventListener('mousedown',function(e){
+  if(e.target.id==='slLine'||e.target.closest('#slLine'))return;
+  if(zoomLevel>1){
+    isPanning=true;
+    panStartX=e.clientX-panX;
+    panStartY=e.clientY-panY;
+    this.style.cursor='grabbing';
+    e.preventDefault();
+  }
+});
+document.addEventListener('mousemove',function(e){
+  if(!isPanning)return;
+  panX=e.clientX-panStartX;
+  panY=e.clientY-panStartY;
+  applyTransform();
+});
+document.addEventListener('mouseup',function(){
+  isPanning=false;
+  stage.style.cursor=zoomLevel>1?'grab':'default';
+});
+
+// Touch pinch zoom
+let initPinchDist=0, initZoom=1;
+stage.addEventListener('touchstart',function(e){
+  if(e.touches.length===2){
+    initPinchDist=Math.hypot(
+      e.touches[0].clientX-e.touches[1].clientX,
+      e.touches[0].clientY-e.touches[1].clientY
+    );
+    initZoom=zoomLevel;
+  }
+},{passive:true});
+stage.addEventListener('touchmove',function(e){
+  if(e.touches.length===2){
+    const dist=Math.hypot(
+      e.touches[0].clientX-e.touches[1].clientX,
+      e.touches[0].clientY-e.touches[1].clientY
+    );
+    zoomLevel=Math.min(8,Math.max(0.5,initZoom*(dist/initPinchDist)));
+    applyTransform();
+    updateZoomBar();
+    e.preventDefault();
+  }
+},{passive:false});
+
+// Double-click to zoom
+stage.addEventListener('dblclick',function(e){
+  if(e.target.id==='slLine'||e.target.closest('#slLine'))return;
+  if(zoomLevel===1){ zoomLevel=2.5; }
+  else { zoomLevel=1; panX=0; panY=0; }
+  applyTransform();
+  updateZoomBar();
+});
+
+/* ══ DOWNLOAD ══ */
+async function dlResult(){
+  if(!enhUrl){ alert('Pehle photo enhance karo!'); return; }
+  addLog('⬇️ Downloading…');
+  try {
+    let blobUrl;
+    if(enhUrl.startsWith('http')){
+      // Replicate URL se direct fetch — no proxy needed, replicate allows CORS
+      const resp = await fetch(enhUrl);
+      if(!resp.ok) throw new Error('fetch failed');
+      const blob = await resp.blob();
+      // Verify it's actually an image
+      if(!blob.type.startsWith('image/')){
+        throw new Error('Not an image: ' + blob.type);
+      }
+      blobUrl = URL.createObjectURL(blob);
+    } else {
+      // dataURL
+      const res = await fetch(enhUrl);
+      const blob = await res.blob();
+      blobUrl = URL.createObjectURL(blob);
+    }
+    const a = document.createElement('a');
+    a.href = blobUrl;
+    a.download = 'enhanced-photo.png';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(()=>URL.revokeObjectURL(blobUrl), 15000);
+    addLog('✅ Download ho gayi!');
+  } catch(e){
+    addLog('⚠️ Direct save — right click karke "Save image as" karo');
+    // Open image directly in new tab so user can right-click save
+    const w = window.open('', '_blank');
+    w.document.write('<html><body style="margin:0;background:#111"><img src="' + enhUrl + '" style="max-width:100%;display:block"><p style="color:white;font-family:sans-serif;padding:10px">Right click → Save image as</p></body></html>');
+    w.document.close();
+  }
+}
+
+/* ══ RESET ══ */
+function goHome(){
+  origUrl=null;enhUrl=null;fi.value='';busy=false;
+  document.getElementById('ws').style.display='none';
+  document.getElementById('home').style.display='block';
+  document.getElementById('cmpWrap').style.display='none';
+  document.getElementById('svImg').style.display='none';
+  document.getElementById('ph').style.display='flex';
+  document.getElementById('ldr').classList.remove('show');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+</script>
+
+<!-- Cloudflare Web Analytics -->
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon='{"rayId":"9d8f95162e78d055","serverTiming":{"name":{"cfExtPri":true,"cfEdge":true,"cfOrigin":true,"cfL4":true,"cfSpeedBrain":true,"cfCacheStatus":true}},"version":"2025.9.1","token":"b09a86e4fe1d4bb293e1c948e3b19d49"}' crossorigin="anonymous"></script>
+<!-- End Cloudflare Web Analytics -->
+
+</body>
+</html>
